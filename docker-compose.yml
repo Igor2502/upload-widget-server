@@ -5,7 +5,7 @@ services:
       - '5432:5432'
     environment:
       - POSTGRES_USER=docker
-      - POSTGRES_POSSWORD=docker
+      - POSTGRES_PASSWORD=docker
       - POSTGRES_DB=upload
     volumes:
       - './docker:/docker-entrypoint-initdb.d'
