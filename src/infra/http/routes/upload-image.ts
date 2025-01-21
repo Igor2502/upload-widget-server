@@ -1,6 +1,4 @@
 import { uploadImage } from '@/app/functions/upload-image'
-import { db } from '@/infra/db'
-import { schema } from '@/infra/db/schemas'
 import { isRight, unwrapEither } from '@/shared/either'
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
@@ -12,10 +10,6 @@ export const uploadImageRoute: FastifyPluginAsyncZod = async server => {
       schema: {
         summary: 'Upload an image',
         consumes: ['multipart/form-data'],
-        // body: z.object({
-        //   name: z.string(),
-        //   password: z.string().optional(),
-        // }),
         response: {
           201: z.null().describe('Image uploaded'),
           400: z.object({ message: z.string() }),
@@ -36,6 +30,12 @@ export const uploadImageRoute: FastifyPluginAsyncZod = async server => {
         contentType: uploadedFile.mimetype,
         contentStream: uploadedFile.file,
       })
+
+      if (uploadedFile.file.truncated) {
+        return reply.status(400).send({
+          message: 'File size limit reached',
+        })
+      }
 
       if (isRight(result)) {
         console.log(unwrapEither(result))
